@@ -7,6 +7,11 @@ class Pencil:
         self.eraser_durability = eraser_durability
 
     def write(self, text_on_page, text_to_be_written):
+        for char in text_to_be_written:
+            if (char.isupper()):
+                self.current_point_durability -= 2
+            else:
+                self.current_point_durability -= 1
         return text_on_page + text_to_be_written
 
     def sharpen(self):

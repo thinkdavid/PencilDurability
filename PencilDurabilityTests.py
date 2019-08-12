@@ -27,6 +27,23 @@ class TestWrite(TestPencil):
     def test_write_to_non_empty(self):
         self.assertEqual(self.pencil.write("the lazy dog ", "jumped over the fox"), "the lazy dog jumped over the fox")
 
+class TestPointDegradation(TestPencil):
+    def test_point_degradation_capital(self):
+        self.pencil.write("","A")
+        self.assertEqual(self.pencil.current_point_durability, self.pencil.initial_point_durability-2)
+
+    def test_point_degradation_lowercase(self):
+        self.pencil.write("","a")
+        self.assertEqual(self.pencil.current_point_durability, self.pencil.initial_point_durability-1)
+
+    def test_point_degradation_number(self):
+        self.pencil.write("","1")
+        self.assertEqual(self.pencil.current_point_durability, self.pencil.initial_point_durability-1)
+
+    def test_point_degradation_symbol(self):
+        self.pencil.write("","$")
+        self.assertEqual(self.pencil.current_point_durability, self.pencil.initial_point_durability-1)
+
 class TestSharpen(TestPencil):
     def test_sharpen_durability(self):
         self.pencil.current_point_durability -= 4
