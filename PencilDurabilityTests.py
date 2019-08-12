@@ -3,18 +3,18 @@ from Pencil import Pencil
 
 class TestPencil(unittest.TestCase):
     def setUp(self):
-        self.pencil = Pencil(10,5,9)
+        self.pencil = Pencil(100,5,99)
 
 
 class TestInit(TestPencil):
     def test_initial_point_durability(self):
-        self.assertEqual(self.pencil.initial_point_durability, 10)
+        self.assertEqual(self.pencil.initial_point_durability, 100)
 
     def test_initial_point_durability(self):
-        self.assertEqual(self.pencil.current_point_durability, 10)
+        self.assertEqual(self.pencil.current_point_durability, 100)
 
     def test_initial_eraser_durability(self):
-        self.assertEqual(self.pencil.eraser_durability, 9)
+        self.assertEqual(self.pencil.eraser_durability, 99)
 
     def test_initial_pencil_length(self):
         self.assertEqual(self.pencil.pencil_length, 5)
@@ -43,6 +43,19 @@ class TestPointDegradation(TestPencil):
     def test_point_degradation_symbol(self):
         self.pencil.write("","$")
         self.assertEqual(self.pencil.current_point_durability, self.pencil.initial_point_durability-1)
+
+    def test_point_degradation_space(self):
+        self.pencil.write("", " ")
+        self.assertEqual(self.pencil.current_point_durability, self.pencil.initial_point_durability)
+
+    def test_point_degradation_space(self):
+        self.pencil.write("", "\n")
+        self.assertEqual(self.pencil.current_point_durability, self.pencil.initial_point_durability)
+
+    def test_point_degradation_string(self):
+        self.pencil.write("","The Lazy Dog") #3 capitals = 6, 7 lowercase = 7
+        self.assertEqual(self.pencil.current_point_durability, self.pencil.initial_point_durability - 13)
+
 
 class TestSharpen(TestPencil):
     def test_sharpen_durability(self):
