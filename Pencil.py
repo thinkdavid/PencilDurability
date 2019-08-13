@@ -9,11 +9,14 @@ class Pencil:
     def write(self, text_on_page, text_to_be_written):
         new_text = ""
         for char in text_to_be_written:
-            if self.current_point_durability == 0:
+            if self.current_point_durability <= 0:
                 new_text += " "
             elif (char.isupper()):
-                self.current_point_durability -= 2 #revisit what we do if durability is at 1
-                new_text += char
+                if self.current_point_durability > 1: #if durability was at 1, we can't write an uppercase
+                    self.current_point_durability -= 2
+                    new_text += char
+                else:
+                    new_text += " "
             elif(char == ' ' or char == '\n'):
                 self.current_point_durability -= 0
                 new_text += char
@@ -29,3 +32,24 @@ class Pencil:
             self.pencil_length -= 1
         else:
             print("The pencil is too short to sharpen!")
+
+    def erase(self, text_on_page, text_to_erase):
+        text_to_erase.strip(" ")
+        text_to_erase.strip("\n")
+        index = text_on_page.rfind(text_to_erase) # index where the word was found.
+        if index == -1 or len(text_to_erase) < 1:
+            return text_on_page
+        new_text = "" # the number of erased characters
+        for i in range(index+len(text_to_erase)-1, index-1, -1): #the string length is the max amount of erasure
+            if text_on_page[i] == ' ' or text_on_page[i] == '\n':
+                new_text += text_on_page[i]
+                continue
+            if self.eraser_durability > 0:
+                new_text += " "
+                self.eraser_durability -= 1
+            else:
+                break
+        return text_on_page[0: index + len(text_to_erase) - len(new_text)] \
+               + new_text \
+               + text_on_page[index+len(text_to_erase):]
+

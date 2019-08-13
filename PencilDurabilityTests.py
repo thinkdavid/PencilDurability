@@ -6,7 +6,6 @@ class TestPencil(unittest.TestCase):
         self.pencil = Pencil(100,5,99)
         self.pencil2 = Pencil(50, 10, 110)
 
-
 class TestInit(TestPencil):
     def test_initial_point_durability(self):
         self.assertEqual(self.pencil.initial_point_durability, 100)
@@ -24,7 +23,6 @@ class TestInit(TestPencil):
         self.assertEqual(self.pencil.pencil_length, 5)
         self.assertEqual(self.pencil2.pencil_length, 10)
 
-
 class TestWrite(TestPencil):
     def test_write_to_empty(self):
         self.assertEqual(self.pencil.write("", "the lazy dog"), "the lazy dog")
@@ -35,6 +33,16 @@ class TestWrite(TestPencil):
     def test_write_while_point_at_0(self):
         self.pencil.current_point_durability = 0
         self.assertEqual("Hello, Wor  ", self.pencil.write("Hello, Wor", "ld"))
+
+    def test_write_capital_while_point_at_1(self):
+        self.pencil.current_point_durability = 1
+        self.assertEqual("Hello,  ", self.pencil.write("Hello,", " W"))
+
+    def test_write_capital_while_point_at_1_with_lowerCase_after(self):
+        self.pencil.current_point_durability = 1
+        self.assertEqual(" e   ", self.pencil.write("", "Hello"))
+        self.pencil.current_point_durability = 1
+        self.assertEqual("  e   ", self.pencil.write("", "H ello"))
 
     def test_write_to_point_degradation(self):
         self.pencil.current_point_durability = 6
@@ -93,16 +101,45 @@ class TestSharpen(TestPencil):
 
 class TestErase(TestPencil):
     def test_erase_text_on_page(self):
-        pass
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "Fence"), "The Lazy Dog Jumped Over The      ")
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "og"), "The Lazy D   Jumped Over The Fence")
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "he"), "The Lazy Dog Jumped Over T   Fence")
 
     def test_erase_text_not_on_page(self):
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "Animals"),
+                         "The Lazy Dog Jumped Over The Fence")
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "abc"),
+                         "The Lazy Dog Jumped Over The Fence")
+
+
+    def test_eraser_erase_str_with_white_space(self):
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "e Fence"),
+                         "The Lazy Dog Jumped Over Th       ")
+
+    def test_eraser_erase_space(self):
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", " "),
+                         "The Lazy Dog Jumped Over The Fence")
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "  "),
+                         "The Lazy Dog Jumped Over The Fence")
+        self.assertEqual(self.pencil.erase("The Lazy Dog \n Jumped Over The Fence", "\n"),
+                         "The Lazy Dog \n Jumped Over The Fence")
+        self.assertEqual(self.pencil.erase("The Lazy Dog \n Jumped Over The Fence", "\n\n"),
+                         "The Lazy Dog \n Jumped Over The Fence")
+
+    def test_eraser_passed_empty_string_to_erase(self):
+        pass
+    def test_eraser_passed_empty_string_on_paper(self):
         pass
 
     def test_eraser_degradation_without_white_space(self):
-        pass
+        before_eraser = self.pencil.eraser_durability
+        self.pencil.erase("The Lazy Dog Jumped Over The Fence", "Fence")
+        self.assertEqual(before_eraser-5, self.pencil.eraser_durability)
 
     def test_eraser_degradation_with_white_space(self):
-        pass
+        before_eraser = self.pencil.eraser_durability
+        self.pencil.erase("The Lazy Dog Jumped Over The Fence", "e Fence")
+        self.assertEqual(before_eraser - 6, self.pencil.eraser_durability)
 
     def test_erase_text_while_degraded_eraser(self):
         pass
