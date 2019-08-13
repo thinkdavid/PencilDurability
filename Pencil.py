@@ -8,22 +8,37 @@ class Pencil:
 
     def _write_helper(self, text_on_page, text_to_be_written, start_index):
         new_text = ""
+        page_index = start_index
         for char in text_to_be_written:
             if self.current_point_durability <= 0:
                 new_text += " "
-            elif (char.isupper()):
-                if self.current_point_durability > 1:  # if durability was at 1, we can't write an uppercase
-                    self.current_point_durability -= 2
-                    new_text += char
+            elif page_index < len(text_on_page):
+                if text_on_page[page_index] != '\n' and text_on_page[page_index] != ' ':
+                    #collision
+                    new_text += '@'
+                    self.current_point_durability -= 1
                 else:
-                    new_text += " "
-            elif (char == ' ' or char == '\n'):
-                self.current_point_durability -= 0
+                    new_text = self._write_characters(new_text, char)
+                page_index += 1
+            else:
+                new_text = self._write_characters(new_text, char)
+
+        return text_on_page[0: start_index] + new_text
+
+    def _write_characters(self, new_text, char):
+        if (char.isupper()):
+            if self.current_point_durability > 1:  # if durability was at 1, we can't write an uppercase
+                self.current_point_durability -= 2
                 new_text += char
             else:
-                self.current_point_durability -= 1
-                new_text += char
-        return text_on_page[0: start_index] + new_text
+                new_text += " "
+        elif (char == ' ' or char == '\n'):
+            self.current_point_durability -= 0
+            new_text += char
+        else:
+            self.current_point_durability -= 1
+            new_text += char
+        return new_text
 
     def write(self, text_on_page, text_to_be_written):
         return self._write_helper(text_on_page, text_to_be_written, len(text_on_page))
@@ -69,8 +84,7 @@ class Pencil:
             return text_on_page
         # index is the start of the word that we wanted to erase
         # index+len(text_to_edit) is the start of where we began erasing
-        # next will have to handle when we don't completely finish erasing -- i'm gonna assume that's gonna be a collision
-        print(after_erase_text)
+        # next will have to handle when we don't completely finish erasing --
+
         edited_text = self._write_helper(after_erase_text, text_to_replace_with, index)
-        print(edited_text)
         return edited_text + after_erase_text[index + len(text_to_replace_with):].rstrip()

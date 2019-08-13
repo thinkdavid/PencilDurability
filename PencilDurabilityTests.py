@@ -171,11 +171,13 @@ class TestEdit(TestPencil):
     def test_edit_by_replacing_with_longer_string(self):
         editedString = self.pencil.edit("Hello, World", "ello, World", "i, Y'all")
         self.assertEqual(editedString, "Hi, Y'all")
-        editedString = self.pencil.edit("New City Road", "New City", "Old Town Road")
+        editedString = self.pencil.edit("New City Road", "New City", "Old Town")
         self.assertEqual(editedString, "Old Town Road")
 
     def test_edit_with_collisions(self):
-        pass
+        editedString = self.pencil.edit("Hi World", "Hi", "Hello,")
+        self.assertEqual(editedString,  "Hel@@@ld")
+
     def test_edit_with_degraded_point(self):
         pass
     def test_edit_with_degraded_eraser(self):
