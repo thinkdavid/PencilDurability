@@ -111,7 +111,6 @@ class TestErase(TestPencil):
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "abc"),
                          "The Lazy Dog Jumped Over The Fence")
 
-
     def test_eraser_erase_str_with_white_space(self):
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "e Fence"),
                          "The Lazy Dog Jumped Over Th       ")
@@ -127,9 +126,12 @@ class TestErase(TestPencil):
                          "The Lazy Dog \n Jumped Over The Fence")
 
     def test_eraser_passed_empty_string_to_erase(self):
-        pass
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", ""),
+                         "The Lazy Dog Jumped Over The Fence")
+
     def test_eraser_passed_empty_string_on_paper(self):
-        pass
+        self.assertEqual(self.pencil.erase("", "Hello"),
+                         "")
 
     def test_eraser_degradation_without_white_space(self):
         before_eraser = self.pencil.eraser_durability
@@ -142,11 +144,15 @@ class TestErase(TestPencil):
         self.assertEqual(before_eraser - 6, self.pencil.eraser_durability)
 
     def test_erase_text_while_degraded_eraser(self):
-        pass
+        self.pencil.eraser_durability = 0
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "The"),
+                         "The Lazy Dog Jumped Over The Fence")
 
     def test_erase_text_to_degraded_eraser(self):
         # test the case where the eraser becomes degraded while erasing
-        pass
+        self.pencil.eraser_durability = 2
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "The"),
+                         "The Lazy Dog Jumped Over T   Fence")
 
 if __name__ == '__main__':
 	unittest.main()
