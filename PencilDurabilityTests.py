@@ -2,7 +2,6 @@ import unittest
 
 from Pencil import Pencil
 
-
 class TestPencil(unittest.TestCase):
     def setUp(self):
         self.pencil = Pencil(100, 5, 99)
@@ -179,9 +178,15 @@ class TestEdit(TestPencil):
         self.assertEqual(editedString,  "Hel@@@ld")
 
     def test_edit_with_degraded_point(self):
-        pass
+        self.pencil.current_point_durability = 0
+        editedString = self.pencil.edit("Hi World", "orl", "izar")
+        self.assertEqual(editedString, "Hi W   d") #no point so no collision
+
     def test_edit_with_degraded_eraser(self):
-        pass
+        self.pencil.eraser_durability = 0
+        editedString = self.pencil.edit("Hi World", "orl", "izar")
+        self.assertEqual(editedString, "Hi W@@@@")
+
     def test_edit_with_point_becoming_degraded(self):
         pass
     def test_edit_with_eraser_becoming_degraded(self):
