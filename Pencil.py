@@ -61,7 +61,7 @@ class Pencil:
         if index == -1:
             return text_on_page
         else:
-            return new_text
+            return new_text.rstrip()
 
     def edit(self, text_on_page, text_to_edit, text_to_replace_with):
         index, after_erase_text = self._erase_helper(text_on_page, text_to_edit)
@@ -70,7 +70,7 @@ class Pencil:
         # index is the start of the word that we wanted to erase
         # index+len(text_to_edit) is the start of where we began erasing
         # next will have to handle when we don't completely finish erasing -- i'm gonna assume that's gonna be a collision
-        # print(after_erase_text)
+        print(after_erase_text)
         edited_text = self._write_helper(after_erase_text, text_to_replace_with, index)
-        # print(edited_text)
-        return edited_text + after_erase_text[index + len(text_to_replace_with):]
+        print(edited_text)
+        return edited_text + after_erase_text[index + len(text_to_replace_with):].rstrip()

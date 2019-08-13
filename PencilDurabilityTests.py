@@ -104,13 +104,13 @@ class TestSharpen(TestPencil):
 class TestErase(TestPencil):
     def test_erase_text_on_page(self):
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "Fence"),
-                         "The Lazy Dog Jumped Over The      ")
+                         "The Lazy Dog Jumped Over The")
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "og"),
                          "The Lazy D   Jumped Over The Fence")
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "he"),
                          "The Lazy Dog Jumped Over T   Fence")
-        self.assertEqual(len(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "he")),
-                         len("The Lazy Dog Jumped Over T   Fence"))
+        self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over A Fence", "The"),
+                         "    Lazy Dog Jumped Over A Fence")
 
     def test_erase_text_not_on_page(self):
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "Animals"),
@@ -120,7 +120,7 @@ class TestErase(TestPencil):
 
     def test_eraser_erase_str_with_white_space(self):
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "e Fence"),
-                         "The Lazy Dog Jumped Over Th       ")
+                         "The Lazy Dog Jumped Over Th")
 
     def test_eraser_erase_space(self):
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", " "),
@@ -168,10 +168,11 @@ class TestEdit(TestPencil):
         editedString = self.pencil.edit("Hello, World", "ello", "i")
         self.assertEqual(editedString, "Hi   , World")
 
-    def test_edit_by_replacing_word_with_white_space(self):
-        pass
-        # editedString = self.pencil.edit("Hello, World", "ello, World", "i, Y'all")
-        # self.assertEqual(editedString, "Hi, Y'all")
+    def test_edit_by_replacing_with_longer_string(self):
+        editedString = self.pencil.edit("Hello, World", "ello, World", "i, Y'all")
+        self.assertEqual(editedString, "Hi, Y'all")
+        editedString = self.pencil.edit("New City Road", "New City", "Old Town Road")
+        self.assertEqual(editedString, "Old Town Road")
 
     def test_edit_with_collisions(self):
         pass
