@@ -2,10 +2,12 @@ import unittest
 
 from Pencil import Pencil
 
+
 class TestPencil(unittest.TestCase):
     def setUp(self):
         self.pencil = Pencil(100, 5, 99)
         self.pencil2 = Pencil(50, 10, 110)
+
 
 class TestInit(TestPencil):
     def test_initial_point_durability(self):
@@ -24,12 +26,16 @@ class TestInit(TestPencil):
         self.assertEqual(self.pencil.pencil_length, 5)
         self.assertEqual(self.pencil2.pencil_length, 10)
 
+
 class TestWrite(TestPencil):
     def test_write_to_empty(self):
         self.assertEqual(self.pencil.write("", "the lazy dog"), "the lazy dog")
 
     def test_write_to_non_empty(self):
         self.assertEqual(self.pencil.write("the lazy dog ", "jumped over the fox"), "the lazy dog jumped over the fox")
+
+    def test_write_white_spaces(self):
+        self.assertEqual(self.pencil.write("", "    the lazy dog  "), "    the lazy dog  ")
 
     def test_write_while_point_at_0(self):
         self.pencil.current_point_durability = 0
@@ -52,6 +58,7 @@ class TestWrite(TestPencil):
     def test_write_to_point_degradation_with_spaces(self):
         self.pencil.current_point_durability = 6
         self.assertEqual("Hello       ", self.pencil.write("", "Hello, World"))
+
 
 class TestPointDegradation(TestPencil):
     def test_point_degradation_capital(self):
@@ -82,6 +89,7 @@ class TestPointDegradation(TestPencil):
         self.pencil.write("", "The Lazy Dog")  # 3 capitals = 6, 7 lowercase = 7
         self.assertEqual(self.pencil.current_point_durability, self.pencil.initial_point_durability - 13)
 
+
 class TestSharpen(TestPencil):
     def test_sharpen_durability(self):
         self.pencil.current_point_durability -= 4
@@ -99,6 +107,7 @@ class TestSharpen(TestPencil):
         old_durability = self.pencil.current_point_durability
         self.pencil.sharpen()
         self.assertEqual(self.pencil.current_point_durability, old_durability)
+
 
 class TestErase(TestPencil):
     def test_erase_text_on_page(self):
@@ -160,6 +169,7 @@ class TestErase(TestPencil):
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "The"),
                          "The Lazy Dog Jumped Over T   Fence")
 
+
 class TestEdit(TestPencil):
     def test_edit_by_replacing_word(self):
         editedString = self.pencil.edit("Hello, World", "World", "Accenture")
@@ -175,12 +185,12 @@ class TestEdit(TestPencil):
 
     def test_edit_with_collisions(self):
         editedString = self.pencil.edit("Hi World", "Hi", "Hello,")
-        self.assertEqual(editedString,  "Hel@@@ld")
+        self.assertEqual(editedString, "Hel@@@ld")
 
     def test_edit_with_degraded_point(self):
         self.pencil.current_point_durability = 0
         editedString = self.pencil.edit("Hi World", "orl", "izar")
-        self.assertEqual(editedString, "Hi W   d") #no point so no collision
+        self.assertEqual(editedString, "Hi W   d")  # no point so no collision
 
     def test_edit_with_degraded_eraser(self):
         self.pencil.eraser_durability = 0
@@ -188,9 +198,31 @@ class TestEdit(TestPencil):
         self.assertEqual(editedString, "Hi W@@@@")
 
     def test_edit_with_point_becoming_degraded(self):
-        pass
+        self.pencil.current_point_durability = 2
+        editedString = self.pencil.edit("Hi World", "orl", "izar")
+        self.assertEqual(editedString, "Hi Wiz d")  # no point so no collision
+
     def test_edit_with_eraser_becoming_degraded(self):
-        pass
+        self.pencil.eraser_durability = 2
+        editedString = self.pencil.edit("Hi World", "orl", "izar")
+        self.assertEqual(editedString, "Hi W@za@")  # no point so no collision
+
+    def test_edit_with_both_becoming_degraded(self):
+        self.pencil.current_point_durability = 2
+        self.pencil.eraser_durability = 2
+        editedString = self.pencil.edit("Hi World", "orl", "izar")
+        self.assertEqual(editedString, "Hi W@z d")  # no point so no collision
+
+    def test_edit_with_word_not_found(self):
+        editedString = self.pencil.edit("I Love Pancakes", "abc", "Sunshine")
+        self.assertEqual(editedString, "I Love Pancakes")
+
+    def test_edit_with_start_in_page_continue_to_new(self):
+        # basically test when we start the edit inside the text on the page, then go into new
+        editedString = self.pencil.edit("I Love Pancakes", "Pancakes",
+                                        "Waffles, mostly, but Pancakes are a solid choice")
+        self.assertEqual(editedString, "I Love Waffles, mostly, but Pancakes are a solid choice")
+
 
 if __name__ == '__main__':
     unittest.main()
