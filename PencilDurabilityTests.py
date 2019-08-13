@@ -96,8 +96,14 @@ class TestSharpen(TestPencil):
         self.pencil.sharpen()
         self.assertEqual(self.pencil.current_point_durability, self.pencil.initial_point_durability)
 
+    def test_sharpen_if_pencil_at_full_durability(self):
+        old_length = self.pencil.pencil_length
+        self.pencil.sharpen()
+        self.assertEqual(old_length, self.pencil.pencil_length)
+
     def test_sharpen_length(self):
         old_length = self.pencil.pencil_length
+        self.pencil.current_point_durability -= 4
         self.pencil.sharpen()
         self.assertEqual(old_length - 1, self.pencil.pencil_length)
 
@@ -107,6 +113,14 @@ class TestSharpen(TestPencil):
         old_durability = self.pencil.current_point_durability
         self.pencil.sharpen()
         self.assertEqual(self.pencil.current_point_durability, old_durability)
+
+    def test_decrement_of_pencil_length_to_0(self):
+        self.pencil.pencil_length = 1
+        self.pencil.current_point_durability -= 4
+        self.pencil.sharpen()
+        self.pencil.current_point_durability -= 4
+        self.pencil.sharpen()
+        self.assertEqual(self.pencil.initial_point_durability - 4, self.pencil.current_point_durability)
 
 
 class TestErase(TestPencil):
@@ -119,6 +133,8 @@ class TestErase(TestPencil):
                          "The Lazy Dog Jumped Over T   Fence")
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over A Fence", "The"),
                          "    Lazy Dog Jumped Over A Fence")
+        self.assertEqual(self.pencil.erase("How much wood would a woodchuck chuck if a woodchuck could       wood", "chuck"),
+                         "How much wood would a woodchuck chuck if a wood      could       wood")
 
     def test_erase_text_not_on_page(self):
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "Animals"),
@@ -126,11 +142,16 @@ class TestErase(TestPencil):
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "abc"),
                          "The Lazy Dog Jumped Over The Fence")
 
+    def test_erase_wrong_case(self):
+        self.assertEqual(self.pencil.erase("Hello, world!", "hello"), "     , world!")
+        self.assertEqual(self.pencil.erase("Hello, world!", "HELLO"), "     , world!")
+        self.assertEqual(self.pencil.erase("Hello, world!", "HeLlO"), "     , world!")
+
     def test_eraser_erase_str_with_white_space(self):
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "e Fence"),
                          "The Lazy Dog Jumped Over Th")
 
-    def test_eraser_erase_space(self):
+    def test_eraser_erase_white_space(self):
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", " "),
                          "The Lazy Dog Jumped Over The Fence")
         self.assertEqual(self.pencil.erase("The Lazy Dog Jumped Over The Fence", "  "),
@@ -172,56 +193,58 @@ class TestErase(TestPencil):
 
 class TestEdit(TestPencil):
     def test_edit_by_replacing_word(self):
-        editedString = self.pencil.edit("Hello, World", "World", "Accenture")
-        self.assertEqual(editedString, "Hello, Accenture")
-        editedString = self.pencil.edit("Hello, World", "ello", "i")
-        self.assertEqual(editedString, "Hi   , World")
+        edited_string = self.pencil.edit("Hello, World", "World", "Accenture")
+        self.assertEqual(edited_string, "Hello, Accenture")
+        edited_string = self.pencil.edit("Hello, World", "ello", "i")
+        self.assertEqual(edited_string, "Hi   , World")
 
     def test_edit_by_replacing_with_longer_string(self):
-        editedString = self.pencil.edit("Hello, World", "ello, World", "i, Y'all")
-        self.assertEqual(editedString, "Hi, Y'all")
-        editedString = self.pencil.edit("New City Road", "New City", "Old Town")
-        self.assertEqual(editedString, "Old Town Road")
+        edited_string = self.pencil.edit("Hello, World", "ello, World", "i, Y'all")
+        self.assertEqual(edited_string, "Hi, Y'all")
+        edited_string = self.pencil.edit("New City Road", "New City", "Old Town")
+        self.assertEqual(edited_string, "Old Town Road")
 
     def test_edit_with_collisions(self):
-        editedString = self.pencil.edit("Hi World", "Hi", "Hello,")
-        self.assertEqual(editedString, "Hel@@@ld")
+        edited_string = self.pencil.edit("Hi World", "Hi", "Hello,")
+        self.assertEqual(edited_string, "Hel@@@ld")
+        edited_string = self.pencil.edit("An apple a day keeps the doctor away", "apple", "artichoke")
+        self.assertEqual(edited_string, "An artich@k@ay keeps the doctor away")
 
     def test_edit_with_degraded_point(self):
         self.pencil.current_point_durability = 0
-        editedString = self.pencil.edit("Hi World", "orl", "izar")
-        self.assertEqual(editedString, "Hi W   d")  # no point so no collision
+        edited_string = self.pencil.edit("Hi World", "orl", "izar")
+        self.assertEqual(edited_string, "Hi W   d")  # no point so no collision
 
     def test_edit_with_degraded_eraser(self):
         self.pencil.eraser_durability = 0
-        editedString = self.pencil.edit("Hi World", "orl", "izar")
-        self.assertEqual(editedString, "Hi W@@@@")
+        edited_string = self.pencil.edit("Hi World", "orl", "izar")
+        self.assertEqual(edited_string, "Hi W@@@@")
 
     def test_edit_with_point_becoming_degraded(self):
         self.pencil.current_point_durability = 2
-        editedString = self.pencil.edit("Hi World", "orl", "izar")
-        self.assertEqual(editedString, "Hi Wiz d")  # no point so no collision
+        edited_string = self.pencil.edit("Hi World", "orl", "izar")
+        self.assertEqual(edited_string, "Hi Wiz d")  # no point so no collision
 
     def test_edit_with_eraser_becoming_degraded(self):
         self.pencil.eraser_durability = 2
-        editedString = self.pencil.edit("Hi World", "orl", "izar")
-        self.assertEqual(editedString, "Hi W@za@")  # no point so no collision
+        edited_string = self.pencil.edit("Hi World", "orl", "izar")
+        self.assertEqual(edited_string, "Hi W@za@")  # no point so no collision
 
     def test_edit_with_both_becoming_degraded(self):
         self.pencil.current_point_durability = 2
         self.pencil.eraser_durability = 2
-        editedString = self.pencil.edit("Hi World", "orl", "izar")
-        self.assertEqual(editedString, "Hi W@z d")  # no point so no collision
+        edited_string = self.pencil.edit("Hi World", "orl", "izar")
+        self.assertEqual(edited_string, "Hi W@z d")  # no point so no collision
 
     def test_edit_with_word_not_found(self):
-        editedString = self.pencil.edit("I Love Pancakes", "abc", "Sunshine")
-        self.assertEqual(editedString, "I Love Pancakes")
+        edited_string = self.pencil.edit("I Love Pancakes", "abc", "Sunshine")
+        self.assertEqual(edited_string, "I Love Pancakes")
 
     def test_edit_with_start_in_page_continue_to_new(self):
         # basically test when we start the edit inside the text on the page, then go into new
-        editedString = self.pencil.edit("I Love Pancakes", "Pancakes",
+        edited_string = self.pencil.edit("I Love Pancakes", "Pancakes",
                                         "Waffles, mostly, but Pancakes are a solid choice")
-        self.assertEqual(editedString, "I Love Waffles, mostly, but Pancakes are a solid choice")
+        self.assertEqual(edited_string, "I Love Waffles, mostly, but Pancakes are a solid choice")
 
 
 if __name__ == '__main__':

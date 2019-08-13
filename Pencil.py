@@ -50,17 +50,17 @@ class Pencil:
 
     # User Callable Method to sharpen the pencil
     def sharpen(self):
-        if self.pencil_length > 1:
+        if self.pencil_length >= 1 and self.current_point_durability != self.initial_point_durability:
             self.current_point_durability = self.initial_point_durability
             self.pencil_length -= 1
         else:
-            print("The pencil is too short to sharpen!")
+            print("Can't sharpen this pencil!")
 
     # A Helper Method To Allow Both the Erase and Edit Functions to Use It
     def _erase_helper(self, text_on_page, text_to_erase):
         text_to_erase.strip(" ")
         text_to_erase.strip("\n")
-        index = text_on_page.rfind(text_to_erase)  # index where the word was found.
+        index = text_on_page.lower().rfind(text_to_erase.lower())  # index where the word was found.
         if index == -1 or len(text_to_erase) < 1:
             return ((-1, ""))
         new_text = ""  # the number of erased characters
