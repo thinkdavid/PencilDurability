@@ -7,15 +7,21 @@ class Pencil:
         self.eraser_durability = eraser_durability
 
     def write(self, text_on_page, text_to_be_written):
+        new_text = ""
         for char in text_to_be_written:
-            if (char.isupper()):
-                self.current_point_durability -= 2
+            if self.current_point_durability == 0:
+                new_text += " "
+            elif (char.isupper()):
+                self.current_point_durability -= 2 #revisit what we do if durability is at 1
+                new_text += char
             elif(char == ' ' or char == '\n'):
                 self.current_point_durability -= 0
+                new_text += char
             else:
                 self.current_point_durability -= 1
+                new_text += char
 
-        return text_on_page + text_to_be_written
+        return text_on_page + new_text
 
     def sharpen(self):
         if self.pencil_length > 1:

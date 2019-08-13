@@ -27,6 +27,18 @@ class TestWrite(TestPencil):
     def test_write_to_non_empty(self):
         self.assertEqual(self.pencil.write("the lazy dog ", "jumped over the fox"), "the lazy dog jumped over the fox")
 
+    def test_write_while_point_at_0(self):
+        self.pencil.current_point_durability = 0
+        self.assertEqual("Hello, Wor  ", self.pencil.write("Hello, Wor", "ld"))
+
+    def test_write_to_point_degradation(self):
+        self.pencil.current_point_durability = 6
+        self.assertEqual("Hello     ", self.pencil.write("", "HelloWorld"))
+
+    def test_write_to_point_degradation_with_spaces(self):
+        self.pencil.current_point_durability = 6
+        self.assertEqual("Hello       ", self.pencil.write("", "Hello, World"))
+
 class TestPointDegradation(TestPencil):
     def test_point_degradation_capital(self):
         self.pencil.write("","A")
