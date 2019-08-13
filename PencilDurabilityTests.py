@@ -4,20 +4,25 @@ from Pencil import Pencil
 class TestPencil(unittest.TestCase):
     def setUp(self):
         self.pencil = Pencil(100,5,99)
+        self.pencil2 = Pencil(50, 10, 110)
 
 
 class TestInit(TestPencil):
     def test_initial_point_durability(self):
         self.assertEqual(self.pencil.initial_point_durability, 100)
+        self.assertEqual(self.pencil2.initial_point_durability, 50)
 
-    def test_initial_point_durability(self):
+    def test_current_point_durability_before_writing(self):
         self.assertEqual(self.pencil.current_point_durability, 100)
+        self.assertEqual(self.pencil2.current_point_durability, 50)
 
     def test_initial_eraser_durability(self):
         self.assertEqual(self.pencil.eraser_durability, 99)
+        self.assertEqual(self.pencil2.eraser_durability, 110)
 
     def test_initial_pencil_length(self):
         self.assertEqual(self.pencil.pencil_length, 5)
+        self.assertEqual(self.pencil2.pencil_length, 10)
 
 
 class TestWrite(TestPencil):
@@ -68,7 +73,6 @@ class TestPointDegradation(TestPencil):
         self.pencil.write("","The Lazy Dog") #3 capitals = 6, 7 lowercase = 7
         self.assertEqual(self.pencil.current_point_durability, self.pencil.initial_point_durability - 13)
 
-
 class TestSharpen(TestPencil):
     def test_sharpen_durability(self):
         self.pencil.current_point_durability -= 4
@@ -87,6 +91,25 @@ class TestSharpen(TestPencil):
         self.pencil.sharpen()
         self.assertEqual(self.pencil.current_point_durability, old_durability)
 
+class TestErase(TestPencil):
+    def test_erase_text_on_page(self):
+        pass
+
+    def test_erase_text_not_on_page(self):
+        pass
+
+    def test_eraser_degradation_without_white_space(self):
+        pass
+
+    def test_eraser_degradation_with_white_space(self):
+        pass
+
+    def test_erase_text_while_degraded_eraser(self):
+        pass
+
+    def test_erase_text_to_degraded_eraser(self):
+        # test the case where the eraser becomes degraded while erasing
+        pass
 
 if __name__ == '__main__':
 	unittest.main()
