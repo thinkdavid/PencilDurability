@@ -34,13 +34,22 @@ class Pencil:
             print("The pencil is too short to sharpen!")
 
     def erase(self, text_on_page, text_to_erase):
+        index, new_text = self.eraseHelper(text_on_page, text_to_erase)
+        if index == -1:
+            return text_on_page
+        else:
+            return text_on_page[0: index + len(text_to_erase) - len(new_text)] \
+               + new_text \
+               + text_on_page[index+len(text_to_erase):]
+
+    def eraseHelper(self, text_on_page, text_to_erase):
         text_to_erase.strip(" ")
         text_to_erase.strip("\n")
-        index = text_on_page.rfind(text_to_erase) # index where the word was found.
+        index = text_on_page.rfind(text_to_erase)  # index where the word was found.
         if index == -1 or len(text_to_erase) < 1:
-            return text_on_page
-        new_text = "" # the number of erased characters
-        for i in range(index+len(text_to_erase)-1, index-1, -1): #the string length is the max amount of erasure
+            return ((-1, ""))
+        new_text = ""  # the number of erased characters
+        for i in range(index + len(text_to_erase) - 1, index - 1, -1):  # the string length is the max amount of erasure
             if text_on_page[i] == ' ' or text_on_page[i] == '\n':
                 new_text += text_on_page[i]
                 continue
@@ -49,7 +58,11 @@ class Pencil:
                 self.eraser_durability -= 1
             else:
                 break
-        return text_on_page[0: index + len(text_to_erase) - len(new_text)] \
-               + new_text \
-               + text_on_page[index+len(text_to_erase):]
+
+        return ((index, new_text))
+
+
+    def edit(self, text_on_page, text_to_edit, text_to_replace):
+
+        after_erase = self.erase(text_on_page, text_to_edit)
 

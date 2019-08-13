@@ -161,7 +161,15 @@ class TestErase(TestPencil):
 
 class TestEdit(TestPencil):
     def test_edit_by_replacing_word(self):
-        pass
+        editedString = self.pencil.edit("Hello, World", "World", "Accenture")
+        self.assertEqual(editedString, "Hello, Accenture")
+        editedString = self.pencil.edit("Hello, World", "ello", "i")
+        self.assertEqual(editedString, "Hi   , World")
+
+    def test_edit_by_replacing_word_with_white_space(self):
+        editedString = self.pencil.edit("Hello, World", "ello, World", "i, Y'all")
+        self.assertEqual(editedString, "Hi, Y'all")
+
     def test_edit_with_collisions(self):
         pass
     def test_edit_with_degraded_point(self):
